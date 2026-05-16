@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Knowledge Hub Monitor{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="navbar-brand">
+                <a href="{{ url_for('index') }}">Knowledge Hub Monitor</a>
+            </div>
+            <ul class="navbar-links">
+    <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+    {% if session.user %}
+        <li class="navbar-user">{{ session.user.name }}</li>
+        <li><a href="{{ url_for('logout') }}">Sign out</a></li>
+    {% else %}
+        <li><a href="{{ url_for('login') }}">Sign in</a></li>
+    {% endif %}
+</ul>
+        </nav>
+    </header>
+
+    <main class="container">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        <p>The Knowledge Hub Library &middot; Internal Monitoring</p>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard &middot; Knowledge Hub Monitor{% endblock %}
+
+{% block content %}
+<h1>Monitoring Dashboard</h1>
+{% if session.user %}
+    <p class="muted">Signed in as: {{ session.user.name }} ({{ session.user.preferred_username }})</p>
+{% endif %}
+<p class="muted">Last updated: {{ metrics.last_updated }}</p>
+
+<div class="card-grid">
+    <div class="card">
+        <h2>System metrics</h2>
+        <p>OS-level metrics collected from KH-FS01 by the existing agent.</p>
+        {% if metrics.system_metrics_available %}
+            <p>Metrics will display here.</p>
+        {% else %}
+            <p class="warning">Backend API not yet connected. Coming in week 3.</p>
+        {% endif %}
+    </div>
+
+    <div class="card">
+        <h2>Container metrics</h2>
+        <p>CPU, memory, and network usage for running containers.</p>
+        {% if metrics.container_metrics_available %}
+            <p>Metrics will display here.</p>
+        {% else %}
+            <p class="warning">Collector not yet connected. Coming in week 3.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

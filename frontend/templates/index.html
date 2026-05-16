@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block title %}Welcome &middot; Knowledge Hub Monitor{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <h1>Knowledge Hub Monitor</h1>
+    <p class="lead">Internal monitoring tool for The Knowledge Hub library.</p>
+    <p>Use this dashboard to view system health and container status across on-premise and cloud environments.</p>
+    <a href="{{ url_for('login') }}" class="button">Sign in to continue</a>
+</section>
+{% endblock %}

@@ -1,0 +1,18 @@
+services:
+  frontend:
+    build: ./frontend
+    image: kh-cs3-frontend:latest
+    container_name: kh-cs3-frontend
+    ports:
+      - "5000:5000"
+    env_file:
+      - ./frontend/.env
+
+  backend:
+    build: ./backend
+    image: kh-cs3-backend:latest
+    container_name: kh-cs3-backend
+    ports:
+      - "5001:5000"
+    env_file:
+      - ./backend/.env
