@@ -1,0 +1,43 @@
+name: Build and push container images
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:  # allow manual run from the GitHub UI
+
+env:
+  REGISTRY: ${{ secrets.ACR_LOGIN_SERVER }}
+  IMAGE_TAG: ${{ github.sha }}
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Login to Azure Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ secrets.AZURE_CLIENT_ID }}
+          password: ${{ secrets.AZURE_CLIENT_SECRET }}
+
+      - name: Build and push frontend image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./frontend
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/kh-cs3-frontend:${{ env.IMAGE_TAG }}
+            ${{ env.REGISTRY }}/kh-cs3-frontend:latest
+
+      - name: Build and push backend image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/kh-cs3-backend:${{ env.IMAGE_TAG }}
+            ${{ env.REGISTRY }}/kh-cs3-backend:latest
