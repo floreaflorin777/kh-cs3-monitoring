@@ -38,6 +38,7 @@ def initialize_database():
             CREATE TABLE measurements (
                 id INT IDENTITY(1,1) PRIMARY KEY,
                 timestamp DATETIME DEFAULT GETDATE(),
+                hostname NVARCHAR(100) NOT NULL,
                 metric NVARCHAR(50),
                 value FLOAT
             )
@@ -63,22 +64,23 @@ def add_measurement():
     if not data:
         return jsonify({"error": "Request body must be JSON"}), 400
     
+    hostname = data.get("hostname")
     metric = data.get("metric")
     value = data.get("value")
 
-    if not metric or value is None:
-        return jsonify({"error": "Missing 'metric' or 'value' field"}), 400
+    if not hostname or not metric or value is None:
+        return jsonify({"error": "Missing 'hostname', 'metric', or 'value' field"}), 400
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute(
-            "INSERT INTO measurements (timestamp, metric, value) VALUES (GETDATE(), %s, %s)",
-            (metric, value)
+            "INSERT INTO measurements (timestamp, hostname, metric, value) VALUES (GETDATE(), %s, %s, %s)",
+            (hostname, metric, value)
         )
         conn.commit()
         cursor.close()
         conn.close()
-        return jsonify({"status": "received", "metric": metric, "value": value}), 201
+        return jsonify({"status": "received", "hostname": hostname, "metric": metric, "value": value}), 201
     except Exception as e: 
         return jsonify({"error": str(e)}), 500
     
@@ -92,27 +94,36 @@ def get_measurement():
         return jsonify({"error": "Unauthorized"}), 401
     
     metric_filter = request.args.get("metric")
+    hostname_filter = request.args.get("hostname")
 
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
 
+        query = "SELECT id, timestamp, hostname, metric, value FROM measurements"
+        conditions = []
+        params = []
         if metric_filter:
-            cursor.execute(
-                "SELECT id, timestamp, metric, value FROM measurements WHERE metric = %s ORDER BY timestamp DESC",
-                (metric_filter,)
-            )
-        else:
-            cursor.execute(
-                "SELECT id, timestamp, metric, value FROM measurements ORDER BY timestamp DESC"
-            )
+            conditions.append("metric = %s")
+            params.append(metric_filter)
+        if hostname_filter:
+            conditions.append("hostname = %s")
+            params.append(hostname_filter)
+        
+        if conditions:
+            query += " WHERE " + " AND ".join(conditions)
+        query += " ORDER BY timestamp DESC"
+
+        cursor.execute(query, tuple(params))
         rows = cursor.fetchall()
+        
         results = [
     {
         "id": row[0],
         "timestamp": row[1].isoformat(),
-        "metric": row[2],
-        "value": row[3]
+        "hostname":row[2],
+        "metric": row[3],
+        "value": row[4]
     }
     for row in rows
 ]
