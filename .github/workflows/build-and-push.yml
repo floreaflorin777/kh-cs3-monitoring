@@ -60,5 +60,5 @@ jobs:
           inlineScript: |
             az containerapp update \
               --name kh-cs3-backend \
-              --resource-group rg-kh-cs3 \
+              --resource-group KH-CS3 \
               --image ${{ env.REGISTRY }}/kh-cs3-backend:${{ env.IMAGE_TAG }}
