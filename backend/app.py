@@ -116,15 +116,15 @@ def get_measurement():
 
         cursor.execute(query, tuple(params))
         rows = cursor.fetchall()
-        
+
         results = [
-    {
+            {
         "id": row[0],
         "timestamp": row[1].isoformat(),
-        "hostname":row[2],
+        "hostname": row[2],
         "metric": row[3],
         "value": row[4]
-    }
+            }
     for row in rows
 ]
         cursor.close()

@@ -1,4 +1,4 @@
-name: Build and push container images
+name: Build, push, and deploy container images
 
 on:
   push:
@@ -41,3 +41,24 @@ jobs:
           tags: |
             ${{ env.REGISTRY }}/kh-cs3-backend:${{ env.IMAGE_TAG }}
             ${{ env.REGISTRY }}/kh-cs3-backend:latest
+
+      - name: Azure login
+        uses: azure/login@v2
+        with:
+          creds: |
+            {
+              "clientId": "${{ secrets.AZURE_CLIENT_ID }}",
+              "clientSecret": "${{ secrets.AZURE_CLIENT_SECRET }}",
+              "tenantId": "${{ secrets.AZURE_TENANT_ID }}",
+              "subscriptionId": "${{ secrets.AZURE_SUBSCRIPTION_ID }}"
+            }
+
+      - name: Deploy backend to Container Apps
+        uses: azure/cli@v2
+        with:
+          azcliversion: latest
+          inlineScript: |
+            az containerapp update \
+              --name kh-cs3-backend \
+              --resource-group rg-kh-cs3 \
+              --image ${{ env.REGISTRY }}/kh-cs3-backend:${{ env.IMAGE_TAG }}
