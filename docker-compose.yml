@@ -16,3 +16,12 @@ services:
       - "5001:5000"
     env_file:
       - ./backend/.env
+
+  colector:
+    build: ./colector
+    container_name: kh-cs3-colector
+    restart: unless-stopped
+    env_file:
+      - colector/.env
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro

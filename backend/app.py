@@ -82,6 +82,7 @@ def add_measurement():
         conn.close()
         return jsonify({"status": "received", "hostname": hostname, "metric": metric, "value": value}), 201
     except Exception as e: 
+        print(f"POST /api/measurements failed: {e}", flush=True)
         return jsonify({"error": str(e)}), 500
     
 # Create the GET endpoint
